@@ -1,19 +1,17 @@
 #include <ros.h>
-//#include <std_msgs/String.h>
 #include <std_msgs/Float32.h>
 #include <Dps310.h>
 
 // Dps310 Opject
 Dps310 Dps310PressureSensor = Dps310();
 ros::NodeHandle  nh;
-//std_msgs::String str_msg;
 std_msgs::Float32 flt_msg;
-//ros::Publisher pressure_pub("pressure", &str_msg);
 ros::Publisher pressure_pub("pressure", &flt_msg);
 
 void setup() {
-    Serial.begin(9600);
-    while (!Serial);
+  
+//    Serial.begin(9600);
+//    while (!Serial);
 
     //Call begin to initialize Dps310PressureSensor
     //The parameter 0x76 is the bus address. The default address is 0x77 and does not need to be given.
@@ -22,11 +20,11 @@ void setup() {
     //if you are using the Pressure 3 click Board, you need 0x76
     Dps310PressureSensor.begin(Wire);
 
-    Serial.println("Init complete!");
+//    Serial.println("Init complete!");
 
     nh.initNode();
     nh.advertise(pressure_pub);
-    Serial.println("ros init complte!");
+//    Serial.println("ros init complte!");
 
 }
 
@@ -35,46 +33,28 @@ void loop() {
     float pressure;
     uint8_t oversampling = 7;
     int16_t ret;
-    Serial.println();
+//    Serial.println();
 
     //lets the Dps310 perform a Single temperature measurement with the last (or standard) configuration
-    //The result will be written to the paramerter temperature
-    //ret = Dps310PressureSensor.measureTempOnce(temperature);
-    //the commented line below does exactly the same as the one above, but you can also config the precision
+    //The result will be written to the paramerter
     //oversampling can be a value from 0 to 7
-    //the Dps 310 will perform 2^oversampling internal temperature measurements and combine them to one result with higher precision
+    //the Dps 310 will perform 2^oversampling internal pressure measurements and combine them to one result with higher precision
     //measurements with higher precision take more time, consult datasheet for more information
-//    ret = Dps310PressureSensor.measureTempOnce(temperature, oversampling);
-//
+
+    //ret = Dps310PressureSensor.measurePressureOnce(pressure);
+    ret = Dps310PressureSensor.measurePressureOnce(pressure, oversampling);
 //    if (ret != 0) {
 //        //Something went wrong.
 //        //Look at the library code for more information about return codes
 //        Serial.print("FAIL! ret = ");
 //        Serial.println(ret);
 //    } else {
-//        Serial.print("Temperature: ");
-//        Serial.print(temperature);
-//        Serial.println(" degrees of Celsius");
+//        Serial.print("Pressure: ");
+//        Serial.print(pressure);
+//        Serial.println(" Pascal");
 //    }
-
-    //Pressure measurement behaves like temperature measurement
-    //ret = Dps310PressureSensor.measurePressureOnce(pressure);
-    ret = Dps310PressureSensor.measurePressureOnce(pressure, oversampling);
-    if (ret != 0) {
-        //Something went wrong.
-        //Look at the library code for more information about return codes
-        Serial.print("FAIL! ret = ");
-        Serial.println(ret);
-    } else {
-        Serial.print("Pressure: ");
-        Serial.print(pressure);
-        Serial.println(" Pascal");
-    }
-
-//    String pressure_str = String(pressure, 3);
-//    str_msg.data = String(pressure, 3);
+    
     flt_msg.data = pressure;
-//    pressure_pub.publish(&str_msg);
     pressure_pub.publish(&flt_msg);
     nh.spinOnce();
 
