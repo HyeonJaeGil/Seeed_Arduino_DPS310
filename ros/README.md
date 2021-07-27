@@ -25,4 +25,8 @@ sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm
 
 
 # Issue
+- python version issue
 https://answers.ros.org/question/362043/importerror-no-module-named-queue/
+
+- How to calculate the altitude
+https://www.mide.com/air-pressure-at-altitude-calculator
