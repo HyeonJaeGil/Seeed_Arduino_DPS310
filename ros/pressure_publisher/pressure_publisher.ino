@@ -6,7 +6,7 @@
 Dps310 Dps310PressureSensor = Dps310();
 ros::NodeHandle  nh;
 std_msgs::Float32 flt_msg;
-ros::Publisher pressure_pub("pressure", &flt_msg);
+ros::Publisher altitude_pub("altitude", &flt_msg);
 
 void setup() {
   
@@ -23,14 +23,14 @@ void setup() {
 //    Serial.println("Init complete!");
 
     nh.initNode();
-    nh.advertise(pressure_pub);
+    nh.advertise(altitude_pub);
 //    Serial.println("ros init complte!");
 
 }
 
 void loop() {
-//    float temperature;
-    float pressure;
+    float temperature; //celcius
+    float pressure; //pascal
     uint8_t oversampling = 7;
     int16_t ret;
 //    Serial.println();
@@ -40,6 +40,19 @@ void loop() {
     //oversampling can be a value from 0 to 7
     //the Dps 310 will perform 2^oversampling internal pressure measurements and combine them to one result with higher precision
     //measurements with higher precision take more time, consult datasheet for more information
+
+    ret = Dps310PressureSensor.measureTempOnce(temperature, oversampling);
+    temperature += 273.15; //to Kelvin
+//    if (ret != 0) {
+//        //Something went wrong.
+//        //Look at the library code for more information about return codes
+//        Serial.print("FAIL! ret = ");
+//        Serial.println(ret);
+//    } else {
+//        Serial.print("Temperature: ");
+//        Serial.print(temperature);
+//        Serial.println(" degrees of Celsius");
+//    }
 
     //ret = Dps310PressureSensor.measurePressureOnce(pressure);
     ret = Dps310PressureSensor.measurePressureOnce(pressure, oversampling);
@@ -53,9 +66,11 @@ void loop() {
 //        Serial.print(pressure);
 //        Serial.println(" Pascal");
 //    }
+
+    float altitude = -1 * temperature / 0.0065 * ( pow(pressure/101325, 0.19) - 1 ); 
     
-    flt_msg.data = pressure;
-    pressure_pub.publish(&flt_msg);
+    flt_msg.data = altitude;
+    altitude_pub.publish(&flt_msg);
     nh.spinOnce();
 
     //Wait some time

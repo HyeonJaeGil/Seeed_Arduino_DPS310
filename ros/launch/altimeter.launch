@@ -1,0 +1,10 @@
+<launch>
+
+    <node
+        pkg="rosserial_python"
+        type="serial_node.py"
+        name="altimeter_node"
+        args="/dev/arduino_nano"
+    ></node>
+
+</launch>
